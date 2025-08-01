@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitLab Assigned to Me Filter</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            background-color: #fafafa;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .logo {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .title {
+            font-weight: 600;
+            color: #303030;
+            margin: 0;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .status.active {
+            background-color: #e8f5e8;
+            color: #2d7738;
+            border: 1px solid #c3e6c3;
+        }
+
+        .status.inactive {
+            background-color: #fdf2e8;
+            color: #b7472a;
+            border: 1px solid #f0d0a0;
+        }
+
+        .instructions {
+            background-color: #f0f8ff;
+            border: 1px solid #c3d9ff;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .instructions h3 {
+            margin: 0 0 8px 0;
+            color: #1f75cb;
+            font-size: 14px;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 12px;
+        }
+
+        .version {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="logo">👤</span>
+        <h1 class="title">GitLab Assigned to Me</h1>
+    </div>
+
+    <p class="description">
+        This extension adds an "Assigned to Me" button to GitLab merge requests pages for quick filtering.
+    </p>
+
+    <div class="status" id="status">
+        <span id="status-text">Checking page...</span>
+    </div>
+
+    <div class="instructions">
+        <h3>How to use:</h3>
+        <ol>
+            <li>Navigate to any GitLab merge requests page</li>
+            <li>Look for the "👤 Assigned to Me" button</li>
+            <li>Click the button to filter merge requests assigned to you</li>
+        </ol>
+    </div>
+
+    <div class="footer">
+        <div class="version">Version 1.0</div>
+        <div>GitLab Assigned to Me Filter Extension</div>
+    </div>
+
+    <script>
+        // Check if current tab is a GitLab merge requests page
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            const currentTab = tabs[0];
+            const url = currentTab.url;
+            const statusElement = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+
+            const isGitLab = url.includes('gitlab');
+            const isMergeRequests = url.includes('merge_requests') || url.includes('/-/merge_requests');
+
+            if (isGitLab && isMergeRequests) {
+                statusElement.className = 'status active';
+                statusText.textContent = '✓ Active on GitLab merge requests page';
+            } else if (isGitLab) {
+                statusElement.className = 'status inactive';
+                statusText.textContent = '⚠ On GitLab, but not merge requests page';
+            } else {
+                statusElement.className = 'status inactive';
+                statusText.textContent = '✗ Not on a GitLab page';
+            }
+        });
+    </script>
+</body>
+</html>

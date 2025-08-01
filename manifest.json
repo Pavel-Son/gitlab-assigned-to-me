@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "GitLab Assigned to Me Filter",
+  "version": "1.0",
+  "description": "Adds 'Assigned to Me' button to GitLab merge requests page with filtering functionality",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/merge_requests*",
+        "*://*/merge_requests",
+        "*://*/*/-/merge_requests*",
+        "*://*/*/-/merge_requests"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GitLab Assigned to Me Filter"
+  }
+}

@@ -1,0 +1,92 @@
+/* GitLab Assigned to Me Filter Extension Styles */
+
+.assigned-to-me-button {
+    background-color: #1f75cb;
+    color: white;
+    border: 1px solid #1068bf;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 8px;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.assigned-to-me-button:hover {
+    background-color: #1068bf;
+    border-color: #0d5aa7;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.assigned-to-me-button:active {
+    background-color: #0d5aa7;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.assigned-to-me-button:focus {
+    outline: 2px solid #1f75cb;
+    outline-offset: 2px;
+}
+
+/* Container for fallback positioning */
+.assigned-to-me-container {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .assigned-to-me-button {
+        padding: 6px 10px;
+        font-size: 13px;
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .assigned-to-me-button {
+        background-color: #1f75cb;
+        border-color: #1068bf;
+        color: white;
+    }
+
+    .assigned-to-me-button:hover {
+        background-color: #1068bf;
+        border-color: #0d5aa7;
+    }
+
+    .assigned-to-me-container {
+        border-bottom-color: #404040;
+    }
+}
+
+/* GitLab specific integration */
+.nav-controls .assigned-to-me-button {
+    margin-left: 8px;
+}
+
+.filtered-search-wrapper .assigned-to-me-button {
+    margin-left: 12px;
+}
+
+/* Ensure button doesn't break layout */
+.assigned-to-me-button {
+    flex-shrink: 0;
+    min-width: fit-content;
+}
