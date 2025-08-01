@@ -1,10 +1,12 @@
-# GitLab Assigned to Me Filter Extension
+# GitLab MR Filter Extension
 
-A Chrome extension that adds an "Assigned to Me" button to GitLab merge requests pages for quick filtering.
+A Chrome extension that adds two filter buttons to GitLab merge requests pages: "My MRs" for merge requests you created, and "Assigned To me" for merge requests assigned to you for review.
 
 ## Features
 
-- 🎯 **Quick Filter**: One-click filtering of merge requests assigned to you
+- 🎯 **Dual Filtering**: Two buttons for different filtering needs
+  - **My MRs**: Filter merge requests you created (purple button)
+  - **Assigned To me**: Filter merge requests assigned to you for review (blue button)
 - 👤 **Auto-Detection**: Automatically detects your GitLab username
 - 🎨 **GitLab Integration**: Seamlessly integrates with GitLab's interface
 - 📱 **Responsive**: Works on desktop and mobile GitLab views
@@ -33,17 +35,20 @@ gitlab-assigned-to-me/
 ## Usage
 
 1. **Navigate** to any GitLab merge requests page (e.g., `https://gitlab.com/group/project/-/merge_requests`)
-2. **Look for** the "👤 Assigned to Me" button in the page controls area
-3. **Click the button** to filter merge requests assigned to you
-4. **The page will reload** with the filter applied, showing only your assigned merge requests
+2. **Look for** two buttons in the page controls area:
+   - **"My MRs"** (purple button) - for merge requests you created
+   - **"Assigned To me"** (blue button) - for merge requests assigned to you for review
+3. **Click the appropriate button** to filter merge requests
+4. **The page will reload** with the filter applied, showing only the filtered merge requests
 
 ## How It Works
 
 The extension:
 - Detects when you're on a GitLab merge requests page
-- Injects a styled "Assigned to Me" button into the page controls
+- Injects two styled filter buttons into the page controls
 - Automatically identifies your GitLab username from the page
-- Applies the `assignee_username` filter when clicked
+- **"My MRs"** applies the `author_username` filter for MRs you created
+- **"Assigned To me"** applies the `reviewer_username` filter for MRs assigned to you for review
 - Falls back to search input method if URL filtering doesn't work
 
 ## Supported GitLab Versions
@@ -101,6 +106,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ### v1.0 (Current)
 - Initial release
-- Basic "Assigned to Me" filtering functionality
+- Basic "My MRs" filtering functionality
 - GitLab UI integration
 - Responsive design support

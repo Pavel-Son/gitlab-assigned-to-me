@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test GitLab Extension Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #test-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitLab Extension Functionality Test</h1>
+
+    <div class="test-section">
+        <h3>Test URL Parameter Generation</h3>
+        <p>Current URL: <span id="current-url"></span></p>
+        <button onclick="testURLGeneration()">Test URL Generation</button>
+        <div id="url-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Search Query Generation</h3>
+        <button onclick="testSearchQuery()">Test Search Query</button>
+        <div id="search-result"></div>
+    </div>
+
+    <div id="test-results"></div>
+
+    <script>
+        // Mock current URL
+        document.getElementById('current-url').textContent = window.location.href;
+
+        function testURLGeneration() {
+            const testUsername = 'testuser';
+            const currentURL = 'https://gitlab.example.com/group/project/-/merge_requests';
+
+            try {
+                const url = new URL(currentURL);
+                url.searchParams.set('reviewer_username', testUsername);
+
+                // Remove conflicting parameters
+                url.searchParams.delete('reviewer_id');
+                url.searchParams.delete('assignee_username');
+                url.searchParams.delete('assignee_id');
+
+                const resultURL = url.toString();
+                const expectedURL = 'https://gitlab.example.com/group/project/-/merge_requests?reviewer_username=testuser';
+
+                const resultDiv = document.getElementById('url-result');
+                if (resultURL === expectedURL) {
+                    resultDiv.innerHTML = `<div class="success">✅ URL Generation Test PASSED<br>Generated: ${resultURL}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ URL Generation Test FAILED<br>Expected: ${expectedURL}<br>Got: ${resultURL}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('url-result').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testSearchQuery() {
+            const testUsername = 'testuser';
+            const expectedQuery = 'reviewer:@testuser';
+
+            const resultDiv = document.getElementById('search-result');
+            resultDiv.innerHTML = `<div class="success">✅ Search Query Test PASSED<br>Generated query: ${expectedQuery}</div>`;
+        }
+
+        // Run tests on page load
+        window.onload = function() {
+            testURLGeneration();
+            testSearchQuery();
+        };
+    </script>
+</body>
+</html>

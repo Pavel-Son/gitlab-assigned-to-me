@@ -1,5 +1,6 @@
-/* GitLab Assigned to Me Filter Extension Styles */
+/* GitLab Filter Extension Styles */
 
+.my-mrs-button,
 .assigned-to-me-button {
     background-color: #1f75cb;
     color: white;
@@ -9,14 +10,24 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    margin-left: 8px;
-    margin-right: 8px;
+    margin-left: 4px;
+    margin-right: 4px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     transition: all 0.2s ease;
     text-decoration: none;
     white-space: nowrap;
+}
+
+.my-mrs-button {
+    background-color: #6b46c1;
+    border-color: #553c9a;
+}
+
+.my-mrs-button:hover {
+    background-color: #553c9a;
+    border-color: #4c1d95;
 }
 
 .assigned-to-me-button:hover {
@@ -28,10 +39,21 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.my-mrs-button:active {
+    background-color: #4c1d95;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
 .assigned-to-me-button:active {
     background-color: #0d5aa7;
     transform: translateY(0);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.my-mrs-button:focus {
+    outline: 2px solid #6b46c1;
+    outline-offset: 2px;
 }
 
 .assigned-to-me-button:focus {
@@ -43,6 +65,7 @@
 .assigned-to-me-container {
     display: flex;
     align-items: center;
+    gap: 8px;
     padding: 16px 0;
     border-bottom: 1px solid #e5e5e5;
     margin-bottom: 16px;
@@ -50,16 +73,28 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .my-mrs-button,
     .assigned-to-me-button {
         padding: 6px 10px;
         font-size: 13px;
-        margin-left: 4px;
-        margin-right: 4px;
+        margin-left: 2px;
+        margin-right: 2px;
     }
 }
 
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
+    .my-mrs-button {
+        background-color: #6b46c1;
+        border-color: #553c9a;
+        color: white;
+    }
+
+    .my-mrs-button:hover {
+        background-color: #553c9a;
+        border-color: #4c1d95;
+    }
+
     .assigned-to-me-button {
         background-color: #1f75cb;
         border-color: #1068bf;
@@ -77,15 +112,18 @@
 }
 
 /* GitLab specific integration */
+.nav-controls .my-mrs-button,
 .nav-controls .assigned-to-me-button {
     margin-left: 8px;
 }
 
+.filtered-search-wrapper .my-mrs-button,
 .filtered-search-wrapper .assigned-to-me-button {
     margin-left: 12px;
 }
 
-/* Ensure button doesn't break layout */
+/* Ensure buttons don't break layout */
+.my-mrs-button,
 .assigned-to-me-button {
     flex-shrink: 0;
     min-width: fit-content;

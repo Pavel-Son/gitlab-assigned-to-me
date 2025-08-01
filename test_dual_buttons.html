@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dual Button Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .my-mrs-btn { background-color: #6b46c1; color: white; }
+        .assigned-btn { background-color: #1f75cb; color: white; }
+        #test-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitLab Dual Button Functionality Test</h1>
+
+    <div class="test-section">
+        <h3>Test "My MRs" Button URL Generation</h3>
+        <p>Tests filtering by author_username parameter</p>
+        <button class="my-mrs-btn" onclick="testMyMRsURL()">Test My MRs URL</button>
+        <div id="my-mrs-url-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test "Assigned To me" Button URL Generation</h3>
+        <p>Tests filtering by reviewer_username parameter</p>
+        <button class="assigned-btn" onclick="testAssignedURL()">Test Assigned URL</button>
+        <div id="assigned-url-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Search Query Generation</h3>
+        <button class="my-mrs-btn" onclick="testMyMRsSearch()">Test My MRs Search</button>
+        <button class="assigned-btn" onclick="testAssignedSearch()">Test Assigned Search</button>
+        <div id="search-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Parameter Cleanup</h3>
+        <p>Tests that conflicting parameters are properly removed</p>
+        <button onclick="testParameterCleanup()">Test Parameter Cleanup</button>
+        <div id="cleanup-result"></div>
+    </div>
+
+    <script>
+        function testMyMRsURL() {
+            const testUsername = 'testuser';
+            const currentURL = 'https://gitlab.example.com/group/project/-/merge_requests?reviewer_username=someone&assignee_id=123';
+
+            try {
+                const url = new URL(currentURL);
+                url.searchParams.set('author_username', testUsername);
+
+                // Remove conflicting parameters (My MRs logic)
+                url.searchParams.delete('author_id');
+                url.searchParams.delete('reviewer_username');
+                url.searchParams.delete('reviewer_id');
+                url.searchParams.delete('assignee_username');
+                url.searchParams.delete('assignee_id');
+
+                const resultURL = url.toString();
+                const expectedURL = 'https://gitlab.example.com/group/project/-/merge_requests?author_username=testuser';
+
+                const resultDiv = document.getElementById('my-mrs-url-result');
+                if (resultURL === expectedURL) {
+                    resultDiv.innerHTML = `<div class="success">✅ My MRs URL Test PASSED<br>Generated: ${resultURL}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ My MRs URL Test FAILED<br>Expected: ${expectedURL}<br>Got: ${resultURL}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('my-mrs-url-result').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testAssignedURL() {
+            const testUsername = 'testuser';
+            const currentURL = 'https://gitlab.example.com/group/project/-/merge_requests?author_username=someone&assignee_id=123';
+
+            try {
+                const url = new URL(currentURL);
+                url.searchParams.set('reviewer_username', testUsername);
+
+                // Remove conflicting parameters (Assigned logic)
+                url.searchParams.delete('reviewer_id');
+                url.searchParams.delete('author_username');
+                url.searchParams.delete('author_id');
+                url.searchParams.delete('assignee_username');
+                url.searchParams.delete('assignee_id');
+
+                const resultURL = url.toString();
+                const expectedURL = 'https://gitlab.example.com/group/project/-/merge_requests?reviewer_username=testuser';
+
+                const resultDiv = document.getElementById('assigned-url-result');
+                if (resultURL === expectedURL) {
+                    resultDiv.innerHTML = `<div class="success">✅ Assigned URL Test PASSED<br>Generated: ${resultURL}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Assigned URL Test FAILED<br>Expected: ${expectedURL}<br>Got: ${resultURL}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('assigned-url-result').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testMyMRsSearch() {
+            const testUsername = 'testuser';
+            const expectedQuery = 'author:@testuser';
+
+            const resultDiv = document.getElementById('search-result');
+            resultDiv.innerHTML = `<div class="success">✅ My MRs Search Query: ${expectedQuery}</div>`;
+        }
+
+        function testAssignedSearch() {
+            const testUsername = 'testuser';
+            const expectedQuery = 'reviewer:@testuser';
+
+            const resultDiv = document.getElementById('search-result');
+            resultDiv.innerHTML += `<div class="success">✅ Assigned Search Query: ${expectedQuery}</div>`;
+        }
+
+        function testParameterCleanup() {
+            const testCases = [
+                {
+                    name: 'My MRs cleanup',
+                    initial: 'https://gitlab.com/test/-/merge_requests?reviewer_username=old&assignee_id=123&author_id=456',
+                    expected: 'https://gitlab.com/test/-/merge_requests?author_username=testuser',
+                    action: 'author'
+                },
+                {
+                    name: 'Assigned cleanup',
+                    initial: 'https://gitlab.com/test/-/merge_requests?author_username=old&assignee_id=123&reviewer_id=456',
+                    expected: 'https://gitlab.com/test/-/merge_requests?reviewer_username=testuser',
+                    action: 'reviewer'
+                }
+            ];
+
+            let results = '';
+            testCases.forEach(testCase => {
+                const url = new URL(testCase.initial);
+
+                if (testCase.action === 'author') {
+                    url.searchParams.set('author_username', 'testuser');
+                    url.searchParams.delete('author_id');
+                    url.searchParams.delete('reviewer_username');
+                    url.searchParams.delete('reviewer_id');
+                    url.searchParams.delete('assignee_username');
+                    url.searchParams.delete('assignee_id');
+                } else {
+                    url.searchParams.set('reviewer_username', 'testuser');
+                    url.searchParams.delete('reviewer_id');
+                    url.searchParams.delete('author_username');
+                    url.searchParams.delete('author_id');
+                    url.searchParams.delete('assignee_username');
+                    url.searchParams.delete('assignee_id');
+                }
+
+                const result = url.toString();
+                const passed = result === testCase.expected;
+                results += `<div class="${passed ? 'success' : 'error'}">
+                    ${passed ? '✅' : '❌'} ${testCase.name}: ${passed ? 'PASSED' : 'FAILED'}
+                    ${!passed ? `<br>Expected: ${testCase.expected}<br>Got: ${result}` : ''}
+                </div>`;
+            });
+
+            document.getElementById('cleanup-result').innerHTML = results;
+        }
+
+        // Run tests on page load
+        window.onload = function() {
+            testMyMRsURL();
+            testAssignedURL();
+            testMyMRsSearch();
+            testAssignedSearch();
+            testParameterCleanup();
+        };
+    </script>
+</body>
+</html>

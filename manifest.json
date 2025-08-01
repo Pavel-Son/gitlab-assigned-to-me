@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GitLab Assigned to Me Filter",
-  "version": "1.0",
-  "description": "Adds 'Assigned to Me' button to GitLab merge requests page with filtering functionality",
+  "name": "GitLab MR Filter",
+  "version": "1.1.0",
+  "description": "Adds 'My MRs' and 'Assigned To me' buttons to GitLab merge requests page for filtering your created MRs and review assignments",
   "permissions": [
     "activeTab"
   ],

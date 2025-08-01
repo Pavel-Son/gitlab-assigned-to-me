@@ -5,7 +5,7 @@
     // Wait for page to load and check if we're on a GitLab merge requests page
     function init() {
         if (isGitLabMergeRequestsPage()) {
-            addAssignedToMeButton();
+            addFilterButtons();
         }
     }
 
@@ -19,17 +19,29 @@
         const isMergeRequestsPage = url.includes('merge_requests') ||
                                    url.includes('/-/merge_requests');
 
-        return isGitLab && isMergeRequestsPage;
+        // Exclude individual MR pages (URLs ending with /merge_requests/123)
+        const isIndividualMRPage = /\/merge_requests\/\d+(?:\/|$)/.test(url);
+
+        return isGitLab && isMergeRequestsPage && !isIndividualMRPage;
     }
 
-    // Add "Assigned to Me" button to the page
-    function addAssignedToMeButton() {
+    // Add both buttons to the page
+    function addFilterButtons() {
         // Try to find the filter controls area
         const filterContainer = findFilterContainer();
 
-        if (filterContainer && !document.getElementById('assigned-to-me-btn')) {
-            const button = createAssignedToMeButton();
-            filterContainer.appendChild(button);
+        if (filterContainer) {
+            // Add "My MRs" button if it doesn't exist
+            if (!document.getElementById('my-mrs-btn')) {
+                const myMRsButton = createMyMRsButton();
+                filterContainer.appendChild(myMRsButton);
+            }
+
+            // Add "Assigned to Me" button if it doesn't exist
+            if (!document.getElementById('assigned-to-me-btn')) {
+                const assignedButton = createAssignedToMeButton();
+                filterContainer.appendChild(assignedButton);
+            }
         }
     }
 
@@ -68,13 +80,28 @@
         return null;
     }
 
+    // Create the "My MRs" button
+    function createMyMRsButton() {
+        const button = document.createElement('button');
+        button.id = 'my-mrs-btn';
+        button.className = 'btn btn-default my-mrs-button';
+        button.innerHTML = 'My MRs';
+        button.title = 'Filter merge requests created by me';
+
+        button.addEventListener('click', function() {
+            applyMyMRsFilter();
+        });
+
+        return button;
+    }
+
     // Create the "Assigned to Me" button
     function createAssignedToMeButton() {
         const button = document.createElement('button');
         button.id = 'assigned-to-me-btn';
         button.className = 'btn btn-default assigned-to-me-button';
-        button.innerHTML = '👤 Assigned to Me';
-        button.title = 'Filter merge requests assigned to me';
+        button.innerHTML = 'Assigned To me';
+        button.title = 'Filter merge requests assigned to me for review';
 
         button.addEventListener('click', function() {
             applyAssignedToMeFilter();
@@ -83,7 +110,22 @@
         return button;
     }
 
-    // Apply the "assigned to me" filter
+    // Apply the "My MRs" filter (created by me)
+    function applyMyMRsFilter() {
+        const currentUser = getCurrentUser();
+
+        if (!currentUser) {
+            alert('Could not determine current user. Please make sure you are logged in to GitLab.');
+            return;
+        }
+
+        // Try different methods to apply the filter
+        if (!applyMyMRsFilterViaURL(currentUser)) {
+            applyMyMRsFilterViaSearch(currentUser);
+        }
+    }
+
+    // Apply the "assigned to me" filter (reviewer)
     function applyAssignedToMeFilter() {
         const currentUser = getCurrentUser();
 
@@ -93,8 +135,8 @@
         }
 
         // Try different methods to apply the filter
-        if (!applyFilterViaURL(currentUser)) {
-            applyFilterViaSearch(currentUser);
+        if (!applyAssignedToMeFilterViaURL(currentUser)) {
+            applyAssignedToMeFilterViaSearch(currentUser);
         }
     }
 
@@ -151,26 +193,62 @@
         return null;
     }
 
-    // Apply filter via URL modification
-    function applyFilterViaURL(username) {
+    // Apply "My MRs" filter via URL modification (author)
+    function applyMyMRsFilterViaURL(username) {
         const url = new URL(window.location.href);
-        url.searchParams.set('assignee_username', username);
+        url.searchParams.set('author_username', username);
 
         // Remove conflicting parameters
+        url.searchParams.delete('author_id');
+        url.searchParams.delete('reviewer_username');
+        url.searchParams.delete('reviewer_id');
+        url.searchParams.delete('assignee_username');
         url.searchParams.delete('assignee_id');
 
         window.location.href = url.toString();
         return true;
     }
 
-    // Apply filter via search input (fallback method)
-    function applyFilterViaSearch(username) {
+    // Apply "My MRs" filter via search input (fallback method)
+    function applyMyMRsFilterViaSearch(username) {
         const searchInput = document.querySelector('input[placeholder*="Search"]') ||
                            document.querySelector('.filtered-search-input') ||
                            document.querySelector('input[type="search"]');
 
         if (searchInput) {
-            searchInput.value = `assignee:@${username}`;
+            searchInput.value = `author:@${username}`;
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            return true;
+        }
+
+        return false;
+    }
+
+    // Apply "Assigned to me" filter via URL modification (reviewer)
+    function applyAssignedToMeFilterViaURL(username) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('reviewer_username', username);
+
+        // Remove conflicting parameters
+        url.searchParams.delete('reviewer_id');
+        url.searchParams.delete('author_username');
+        url.searchParams.delete('author_id');
+        url.searchParams.delete('assignee_username');
+        url.searchParams.delete('assignee_id');
+
+        window.location.href = url.toString();
+        return true;
+    }
+
+    // Apply "Assigned to me" filter via search input (fallback method)
+    function applyAssignedToMeFilterViaSearch(username) {
+        const searchInput = document.querySelector('input[placeholder*="Search"]') ||
+                           document.querySelector('.filtered-search-input') ||
+                           document.querySelector('input[type="search"]');
+
+        if (searchInput) {
+            searchInput.value = `reviewer:@${username}`;
             searchInput.dispatchEvent(new Event('input', { bubbles: true }));
             searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
             return true;
